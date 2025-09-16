@@ -1,5 +1,5 @@
 /**
- * Unit Tests - Comprehensive test suite for Sky Sports Dashboard
+ * Unit Tests - Comprehensive test suite for Lumara Sports Dashboard
  * 
  * This file demonstrates unit testing capabilities and ensures
  * code quality and reliability across all components.
@@ -20,7 +20,7 @@ class TestSuite {
      * Run all tests
      */
     async runAllTests() {
-        console.log('🧪 Starting Sky Sports Dashboard Test Suite...\n');
+        console.log('🧪 Starting Lumara Sports Dashboard Test Suite...\n');
         
         // Data Service Tests
         this.runDataServiceTests();

@@ -1,7 +1,7 @@
 /**
- * Sky Sports Dashboard - Main Application
+ * Lumara Sports Dashboard - Main Application
  * 
- * This file contains the main application logic for the Sky Sports Dashboard.
+ * This file contains the main application logic for the Lumara Sports Dashboard.
  * It demonstrates real-time data visualization, mobile-responsive design,
  * performance monitoring, and clean documented code.
  * 
@@ -10,12 +10,15 @@
  * @created 2024
  */
 
-class SkySportsDashboard {
+class LumaraSportsDashboard {
     constructor() {
         this.dataService = new DataService();
         this.chartService = new ChartService();
         this.performanceMonitor = new PerformanceMonitor();
         this.analyticsService = new AnalyticsService();
+        this.websocketService = new WebSocketService();
+        this.notificationService = new NotificationService();
+        this.performanceOptimizer = new PerformanceOptimizer();
         
         this.currentTab = 'overview';
         this.refreshInterval = null;
@@ -46,9 +49,12 @@ class SkySportsDashboard {
             // Initialize charts
             this.initializeCharts();
             
+            // Setup WebSocket listeners
+            this.setupWebSocketListeners();
+            
             this.showLoading(false);
             
-            console.log('Sky Sports Dashboard initialized successfully');
+            console.log('Lumara Sports Dashboard initialized successfully');
         } catch (error) {
             console.error('Failed to initialize dashboard:', error);
             this.showError('Failed to initialize dashboard. Please refresh the page.');
@@ -102,6 +108,242 @@ class SkySportsDashboard {
         window.addEventListener('load', () => {
             this.performanceMonitor.recordPageLoad();
         });
+
+        // Mobile-specific event listeners
+        this.setupMobileEventListeners();
+
+        // Dark mode toggle
+        this.setupDarkModeToggle();
+    }
+
+    /**
+     * Set up mobile-specific event listeners
+     */
+    setupMobileEventListeners() {
+        // Touch event handling for better mobile experience
+        let touchStartY = 0;
+        let touchEndY = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        document.addEventListener('touchend', (e) => {
+            touchEndY = e.changedTouches[0].clientY;
+            this.handleSwipe(touchStartY, touchEndY);
+        }, { passive: true });
+
+        // Prevent zoom on double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (e) => {
+            const now = new Date().getTime();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // Handle orientation change
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                this.handleResize();
+                this.chartService.resizeCharts();
+            }, 100);
+        });
+
+        // Add mobile-specific classes
+        if (this.isMobile()) {
+            document.body.classList.add('mobile-device');
+        }
+    }
+
+    /**
+     * Handle swipe gestures
+     * @param {number} startY - Touch start Y position
+     * @param {number} endY - Touch end Y position
+     */
+    handleSwipe(startY, endY) {
+        const swipeThreshold = 50;
+        const diff = startY - endY;
+
+        if (Math.abs(diff) > swipeThreshold) {
+            if (diff > 0) {
+                // Swipe up - could be used for navigation
+                this.handleSwipeUp();
+            } else {
+                // Swipe down - could be used for refresh
+                this.handleSwipeDown();
+            }
+        }
+    }
+
+    /**
+     * Handle swipe up gesture
+     */
+    handleSwipeUp() {
+        // Could be used for navigation or other mobile-specific actions
+        console.log('Swipe up detected');
+    }
+
+    /**
+     * Handle swipe down gesture
+     */
+    handleSwipeDown() {
+        // Could be used for refresh
+        if (this.currentTab === 'overview') {
+            this.refreshLiveScores();
+        }
+    }
+
+    /**
+     * Check if device is mobile
+     * @returns {boolean} True if mobile device
+     */
+    isMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+               window.innerWidth <= 768;
+    }
+
+    /**
+     * Set up dark mode toggle
+     */
+    setupDarkModeToggle() {
+        const toggle = document.getElementById('darkModeToggle');
+        if (!toggle) return;
+
+        // Load saved theme preference
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        this.setTheme(savedTheme);
+
+        // Add click event listener
+        toggle.addEventListener('click', () => {
+            this.toggleTheme();
+        });
+
+        // Add keyboard support
+        toggle.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.toggleTheme();
+            }
+        });
+    }
+
+    /**
+     * Toggle between dark and light theme
+     */
+    toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        this.setTheme(newTheme);
+        
+        // Save preference
+        localStorage.setItem('theme', newTheme);
+        
+        // Show notification
+        this.notificationService.info(
+            'Theme Changed', 
+            `Switched to ${newTheme} mode`
+        );
+    }
+
+    /**
+     * Set theme
+     * @param {string} theme - Theme name ('dark' or 'light')
+     */
+    setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        
+        const toggle = document.getElementById('darkModeToggle');
+        if (toggle) {
+            const icon = toggle.querySelector('i');
+            if (icon) {
+                icon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+            }
+        }
+
+        // Update chart colors if needed
+        this.updateChartColors(theme);
+    }
+
+    /**
+     * Update chart colors based on theme
+     * @param {string} theme - Theme name
+     */
+    updateChartColors(theme) {
+        // This would update chart colors based on the theme
+        // For now, we'll just log it
+        console.log(`Charts updated for ${theme} theme`);
+    }
+
+    /**
+     * Set up WebSocket event listeners
+     */
+    setupWebSocketListeners() {
+        // Live score updates
+        this.websocketService.on('liveScoreUpdate', (scores) => {
+            this.renderLiveScores(scores);
+            this.notificationService.info('Live Scores Updated', 'New score updates available');
+        });
+
+        // Breaking news updates
+        this.websocketService.on('breakingNewsUpdate', (news) => {
+            this.addBreakingNewsItem(news);
+            this.notificationService.warning('Breaking News', news.title);
+        });
+
+        // Performance updates
+        this.websocketService.on('performanceUpdate', (metrics) => {
+            this.updatePerformanceMetrics(metrics);
+        });
+
+        // Connection status updates
+        this.websocketService.on('connected', () => {
+            this.notificationService.success('Connected', 'Real-time updates enabled');
+        });
+
+        this.websocketService.on('disconnected', () => {
+            this.notificationService.error('Disconnected', 'Real-time updates unavailable');
+        });
+
+        this.websocketService.on('connectionFailed', () => {
+            this.notificationService.error('Connection Failed', 'Unable to establish real-time connection');
+        });
+    }
+
+    /**
+     * Add breaking news item to the list
+     * @param {Object} news - News item
+     */
+    addBreakingNewsItem(news) {
+        const container = document.getElementById('breakingNews');
+        if (!container) return;
+
+        const newsItem = document.createElement('div');
+        newsItem.className = 'news-item slide-in';
+        newsItem.innerHTML = `
+            <div class="news-time">${this.formatTime(news.timestamp)}</div>
+            <div class="news-content">
+                <div class="news-title">${news.title}</div>
+                <div class="news-summary">${news.summary}</div>
+            </div>
+        `;
+
+        // Add to top of the list
+        container.insertBefore(newsItem, container.firstChild);
+
+        // Update news count
+        const countElement = document.getElementById('newsCount');
+        if (countElement) {
+            const currentCount = parseInt(countElement.textContent) || 0;
+            countElement.textContent = currentCount + 1;
+        }
+
+        // Remove old items if too many
+        const newsItems = container.querySelectorAll('.news-item');
+        if (newsItems.length > 10) {
+            newsItems[newsItems.length - 1].remove();
+        }
     }
 
     /**
@@ -506,14 +748,32 @@ class SkySportsDashboard {
 
     /**
      * Update performance metrics display
+     * @param {Object} metrics - Performance metrics (optional)
      */
-    updatePerformanceMetrics() {
-        const metrics = this.performanceMonitor.getMetrics();
+    updatePerformanceMetrics(metrics = null) {
+        const currentMetrics = metrics || this.performanceMonitor.getMetrics();
         
-        document.getElementById('pageLoadTime').textContent = metrics.pageLoadTime || '--';
-        document.getElementById('apiResponseTime').textContent = metrics.apiResponseTime || '--';
-        document.getElementById('activeUsers').textContent = metrics.activeUsers || '--';
-        document.getElementById('errorRate').textContent = metrics.errorRate || '--';
+        // Animate counter updates
+        const pageLoadElement = document.getElementById('pageLoadTime');
+        const apiResponseElement = document.getElementById('apiResponseTime');
+        const activeUsersElement = document.getElementById('activeUsers');
+        const errorRateElement = document.getElementById('errorRate');
+        
+        if (pageLoadElement) {
+            this.chartService.animateCounter(pageLoadElement, currentMetrics.pageLoadTime || 0, 1000);
+        }
+        
+        if (apiResponseElement) {
+            this.chartService.animateCounter(apiResponseElement, currentMetrics.apiResponseTime || 0, 1000);
+        }
+        
+        if (activeUsersElement) {
+            this.chartService.animateCounter(activeUsersElement, currentMetrics.activeUsers || 0, 1000);
+        }
+        
+        if (errorRateElement) {
+            this.chartService.animateCounter(errorRateElement, currentMetrics.errorRate || 0, 1000);
+        }
     }
 
     /**
@@ -619,17 +879,20 @@ class SkySportsDashboard {
         
         this.performanceMonitor.destroy();
         this.chartService.destroy();
+        this.websocketService.destroy();
+        this.notificationService.clearAll();
+        this.performanceOptimizer.destroy();
     }
 }
 
 // Initialize the dashboard when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    window.skySportsDashboard = new SkySportsDashboard();
+    window.lumaraSportsDashboard = new LumaraSportsDashboard();
 });
 
 // Clean up on page unload
 window.addEventListener('beforeunload', () => {
-    if (window.skySportsDashboard) {
-        window.skySportsDashboard.destroy();
+    if (window.lumaraSportsDashboard) {
+        window.lumaraSportsDashboard.destroy();
     }
 });

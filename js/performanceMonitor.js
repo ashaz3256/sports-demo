@@ -180,10 +180,10 @@ class PerformanceMonitor {
      * @returns {string} Session ID
      */
     getSessionId() {
-        let sessionId = sessionStorage.getItem('sky_sports_session_id');
+        let sessionId = sessionStorage.getItem('lumara_sports_session_id');
         if (!sessionId) {
             sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            sessionStorage.setItem('sky_sports_session_id', sessionId);
+            sessionStorage.setItem('lumara_sports_session_id', sessionId);
         }
         return sessionId;
     }

@@ -15,17 +15,70 @@ class ChartService {
             responsive: true,
             maintainAspectRatio: false,
             animation: {
-                duration: 750,
-                easing: 'easeInOutQuart'
+                duration: 1000,
+                easing: 'easeInOutQuart',
+                animateRotate: true,
+                animateScale: true
             },
             plugins: {
                 legend: {
                     labels: {
-                        color: '#e2e8f0',
+                        color: '#f8fafc',
                         font: {
-                            family: 'Inter, sans-serif'
-                        }
-                    }
+                            family: 'Inter, sans-serif',
+                            size: 12,
+                            weight: '600'
+                        },
+                        padding: 20,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    },
+                    position: 'top',
+                    align: 'start'
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    backdropFilter: 'blur(10px)',
+                    titleColor: '#f8fafc',
+                    bodyColor: '#cbd5e1',
+                    borderColor: 'rgba(79, 172, 254, 0.3)',
+                    borderWidth: 1,
+                    cornerRadius: 12,
+                    displayColors: true,
+                    titleFont: {
+                        family: 'Inter, sans-serif',
+                        size: 14,
+                        weight: '700'
+                    },
+                    bodyFont: {
+                        family: 'Inter, sans-serif',
+                        size: 12,
+                        weight: '500'
+                    },
+                    padding: 12,
+                    titleSpacing: 8,
+                    bodySpacing: 6
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            elements: {
+                point: {
+                    radius: 6,
+                    hoverRadius: 8,
+                    borderWidth: 3,
+                    hoverBorderWidth: 4
+                },
+                line: {
+                    tension: 0.4,
+                    borderWidth: 3,
+                    hoverBorderWidth: 4
+                },
+                bar: {
+                    borderRadius: 8,
+                    borderSkipped: false
                 }
             }
         };
@@ -47,11 +100,26 @@ class ChartService {
                 datasets: [{
                     label: 'User Activity',
                     data: data.values,
-                    borderColor: '#fbbf24',
-                    backgroundColor: 'rgba(251, 191, 36, 0.1)',
+                    borderColor: '#4facfe',
+                    backgroundColor: 'rgba(79, 172, 254, 0.1)',
                     borderWidth: 3,
                     fill: true,
-                    tension: 0.4
+                    tension: 0.4,
+                    pointBackgroundColor: '#4facfe',
+                    pointBorderColor: '#ffffff',
+                    pointHoverBackgroundColor: '#ffffff',
+                    pointHoverBorderColor: '#4facfe',
+                    pointHoverBorderWidth: 3,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointHitRadius: 10,
+                    pointHoverBorderWidth: 4,
+                    borderCapStyle: 'round',
+                    borderJoinStyle: 'round',
+                    shadowOffsetX: 0,
+                    shadowOffsetY: 4,
+                    shadowBlur: 8,
+                    shadowColor: 'rgba(79, 172, 254, 0.3)'
                 }]
             },
             options: {
@@ -59,24 +127,58 @@ class ChartService {
                 scales: {
                     x: {
                         grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
+                            color: 'rgba(255, 255, 255, 0.1)',
+                            drawBorder: false,
+                            drawTicks: false
                         },
                         ticks: {
-                            color: '#94a3b8'
+                            color: '#94a3b8',
+                            font: {
+                                family: 'Inter, sans-serif',
+                                size: 11,
+                                weight: '500'
+                            },
+                            padding: 10
+                        },
+                        border: {
+                            display: false
                         }
                     },
                     y: {
                         grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
+                            color: 'rgba(255, 255, 255, 0.1)',
+                            drawBorder: false,
+                            drawTicks: false
                         },
                         ticks: {
-                            color: '#94a3b8'
+                            color: '#94a3b8',
+                            font: {
+                                family: 'Inter, sans-serif',
+                                size: 11,
+                                weight: '500'
+                            },
+                            padding: 10
+                        },
+                        border: {
+                            display: false
                         }
+                    }
+                },
+                plugins: {
+                    ...this.chartConfigs.plugins,
+                    legend: {
+                        ...this.chartConfigs.plugins.legend,
+                        display: true,
+                        position: 'top',
+                        align: 'start'
                     }
                 },
                 interaction: {
                     intersect: false,
                     mode: 'index'
+                },
+                onHover: (event, activeElements) => {
+                    event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
                 }
             }
         };
@@ -94,9 +196,32 @@ class ChartService {
 
         const data = this.generateRealTimeData();
         
+        // Smooth transition for real-time updates
         chart.data.labels = data.labels;
         chart.data.datasets[0].data = data.values;
-        chart.update('none'); // No animation for real-time updates
+        
+        // Add subtle animation for real-time updates
+        chart.update('active', {
+            duration: 300,
+            easing: 'easeInOutQuart'
+        });
+        
+        // Add pulse effect to the chart
+        this.addPulseEffect(chart);
+    }
+
+    /**
+     * Add pulse effect to chart
+     * @param {Chart} chart - Chart instance
+     */
+    addPulseEffect(chart) {
+        const canvas = chart.canvas;
+        canvas.style.transition = 'transform 0.3s ease';
+        canvas.style.transform = 'scale(1.02)';
+        
+        setTimeout(() => {
+            canvas.style.transform = 'scale(1)';
+        }, 300);
     }
 
     /**
@@ -107,17 +232,57 @@ class ChartService {
         const chart = this.charts.get('realTime');
         if (!chart) return;
 
-        chart.config.type = type;
-        
-        // Update data structure for different chart types
-        if (type === 'doughnut') {
-            chart.data.datasets[0].data = [30, 25, 20, 15, 10];
-            chart.data.labels = ['Football', 'Cricket', 'Tennis', 'Rugby', 'Other'];
-        } else if (type === 'bar') {
-            chart.data.datasets[0].data = this.generateRealTimeData().values;
-        }
-        
-        chart.update();
+        // Add transition effect
+        const canvas = chart.canvas;
+        canvas.style.transition = 'opacity 0.3s ease';
+        canvas.style.opacity = '0.7';
+
+        setTimeout(() => {
+            chart.config.type = type;
+            
+            // Update data structure for different chart types
+            if (type === 'doughnut') {
+                chart.data.datasets[0].data = [30, 25, 20, 15, 10];
+                chart.data.labels = ['Football', 'Cricket', 'Tennis', 'Rugby', 'Other'];
+                chart.data.datasets[0].backgroundColor = [
+                    'rgba(79, 172, 254, 0.8)',
+                    'rgba(16, 185, 129, 0.8)',
+                    'rgba(245, 158, 11, 0.8)',
+                    'rgba(239, 68, 68, 0.8)',
+                    'rgba(139, 92, 246, 0.8)'
+                ];
+                chart.data.datasets[0].borderColor = [
+                    '#4facfe',
+                    '#10b981',
+                    '#f59e0b',
+                    '#ef4444',
+                    '#8b5cf6'
+                ];
+                chart.data.datasets[0].borderWidth = 2;
+            } else if (type === 'bar') {
+                const data = this.generateRealTimeData();
+                chart.data.datasets[0].data = data.values;
+                chart.data.labels = data.labels;
+                chart.data.datasets[0].backgroundColor = 'rgba(79, 172, 254, 0.8)';
+                chart.data.datasets[0].borderColor = '#4facfe';
+                chart.data.datasets[0].borderWidth = 1;
+            } else if (type === 'line') {
+                const data = this.generateRealTimeData();
+                chart.data.datasets[0].data = data.values;
+                chart.data.labels = data.labels;
+                chart.data.datasets[0].backgroundColor = 'rgba(79, 172, 254, 0.1)';
+                chart.data.datasets[0].borderColor = '#4facfe';
+                chart.data.datasets[0].borderWidth = 3;
+                chart.data.datasets[0].fill = true;
+            }
+            
+            chart.update('active', {
+                duration: 500,
+                easing: 'easeInOutQuart'
+            });
+            
+            canvas.style.opacity = '1';
+        }, 300);
     }
 
     /**
@@ -137,27 +302,96 @@ class ChartService {
                     data: data.pageViews || this.generateRandomData(7),
                     borderColor: '#10b981',
                     backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                    borderWidth: 2,
-                    fill: true
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: '#ffffff',
+                    pointHoverBackgroundColor: '#ffffff',
+                    pointHoverBorderColor: '#10b981',
+                    pointHoverBorderWidth: 3,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointHitRadius: 10,
+                    borderCapStyle: 'round',
+                    borderJoinStyle: 'round',
+                    shadowOffsetX: 0,
+                    shadowOffsetY: 4,
+                    shadowBlur: 8,
+                    shadowColor: 'rgba(16, 185, 129, 0.3)'
                 }, {
                     label: 'Unique Visitors',
                     data: data.uniqueVisitors || this.generateRandomData(7),
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    borderWidth: 2,
-                    fill: true
+                    borderColor: '#4facfe',
+                    backgroundColor: 'rgba(79, 172, 254, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#4facfe',
+                    pointBorderColor: '#ffffff',
+                    pointHoverBackgroundColor: '#ffffff',
+                    pointHoverBorderColor: '#4facfe',
+                    pointHoverBorderWidth: 3,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointHitRadius: 10,
+                    borderCapStyle: 'round',
+                    borderJoinStyle: 'round',
+                    shadowOffsetX: 0,
+                    shadowOffsetY: 4,
+                    shadowBlur: 8,
+                    shadowColor: 'rgba(79, 172, 254, 0.3)'
                 }]
             },
             options: {
                 ...this.chartConfigs,
                 scales: {
                     x: {
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                        ticks: { color: '#94a3b8' }
+                        grid: { 
+                            color: 'rgba(255, 255, 255, 0.1)',
+                            drawBorder: false,
+                            drawTicks: false
+                        },
+                        ticks: { 
+                            color: '#94a3b8',
+                            font: {
+                                family: 'Inter, sans-serif',
+                                size: 11,
+                                weight: '500'
+                            },
+                            padding: 10
+                        },
+                        border: {
+                            display: false
+                        }
                     },
                     y: {
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                        ticks: { color: '#94a3b8' }
+                        grid: { 
+                            color: 'rgba(255, 255, 255, 0.1)',
+                            drawBorder: false,
+                            drawTicks: false
+                        },
+                        ticks: { 
+                            color: '#94a3b8',
+                            font: {
+                                family: 'Inter, sans-serif',
+                                size: 11,
+                                weight: '500'
+                            },
+                            padding: 10
+                        },
+                        border: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    ...this.chartConfigs.plugins,
+                    legend: {
+                        ...this.chartConfigs.plugins.legend,
+                        display: true,
+                        position: 'top',
+                        align: 'start'
                     }
                 }
             }
@@ -183,32 +417,77 @@ class ChartService {
                     label: 'Views',
                     data: data.views || this.generateRandomData(5),
                     backgroundColor: [
-                        'rgba(251, 191, 36, 0.8)',
+                        'rgba(79, 172, 254, 0.8)',
                         'rgba(16, 185, 129, 0.8)',
-                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(245, 158, 11, 0.8)',
                         'rgba(239, 68, 68, 0.8)',
                         'rgba(139, 92, 246, 0.8)'
                     ],
                     borderColor: [
-                        '#fbbf24',
+                        '#4facfe',
                         '#10b981',
-                        '#3b82f6',
+                        '#f59e0b',
                         '#ef4444',
                         '#8b5cf6'
                     ],
-                    borderWidth: 1
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                    shadowOffsetX: 0,
+                    shadowOffsetY: 4,
+                    shadowBlur: 8,
+                    shadowColor: 'rgba(0, 0, 0, 0.1)'
                 }]
             },
             options: {
                 ...this.chartConfigs,
                 scales: {
                     x: {
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                        ticks: { color: '#94a3b8' }
+                        grid: { 
+                            color: 'rgba(255, 255, 255, 0.1)',
+                            drawBorder: false,
+                            drawTicks: false
+                        },
+                        ticks: { 
+                            color: '#94a3b8',
+                            font: {
+                                family: 'Inter, sans-serif',
+                                size: 11,
+                                weight: '500'
+                            },
+                            padding: 10
+                        },
+                        border: {
+                            display: false
+                        }
                     },
                     y: {
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                        ticks: { color: '#94a3b8' }
+                        grid: { 
+                            color: 'rgba(255, 255, 255, 0.1)',
+                            drawBorder: false,
+                            drawTicks: false
+                        },
+                        ticks: { 
+                            color: '#94a3b8',
+                            font: {
+                                family: 'Inter, sans-serif',
+                                size: 11,
+                                weight: '500'
+                            },
+                            padding: 10
+                        },
+                        border: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    ...this.chartConfigs.plugins,
+                    legend: {
+                        ...this.chartConfigs.plugins.legend,
+                        display: true,
+                        position: 'top',
+                        align: 'start'
                     }
                 }
             }
@@ -233,24 +512,43 @@ class ChartService {
                 datasets: [{
                     data: data.values || [45, 40, 15],
                     backgroundColor: [
-                        'rgba(251, 191, 36, 0.8)',
+                        'rgba(79, 172, 254, 0.8)',
                         'rgba(16, 185, 129, 0.8)',
-                        'rgba(59, 130, 246, 0.8)'
+                        'rgba(245, 158, 11, 0.8)'
                     ],
                     borderColor: [
-                        '#fbbf24',
+                        '#4facfe',
                         '#10b981',
-                        '#3b82f6'
+                        '#f59e0b'
                     ],
-                    borderWidth: 2
+                    borderWidth: 3,
+                    hoverBorderWidth: 4,
+                    hoverOffset: 10,
+                    shadowOffsetX: 0,
+                    shadowOffsetY: 4,
+                    shadowBlur: 8,
+                    shadowColor: 'rgba(0, 0, 0, 0.1)'
                 }]
             },
             options: {
                 ...this.chartConfigs,
-                cutout: '60%',
+                cutout: '65%',
                 plugins: {
                     ...this.chartConfigs.plugins,
+                    legend: {
+                        ...this.chartConfigs.plugins.legend,
+                        display: true,
+                        position: 'bottom',
+                        align: 'center',
+                        labels: {
+                            ...this.chartConfigs.plugins.legend.labels,
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
                     tooltip: {
+                        ...this.chartConfigs.plugins.tooltip,
                         callbacks: {
                             label: function(context) {
                                 const label = context.label || '';
@@ -260,6 +558,12 @@ class ChartService {
                                 return `${label}: ${value} (${percentage}%)`;
                             }
                         }
+                    }
+                },
+                elements: {
+                    arc: {
+                        borderWidth: 3,
+                        hoverBorderWidth: 4
                     }
                 }
             }
@@ -284,9 +588,27 @@ class ChartService {
                 datasets: [{
                     label: 'Users',
                     data: data.values || this.generateRandomData(5),
-                    backgroundColor: 'rgba(139, 92, 246, 0.8)',
-                    borderColor: '#8b5cf6',
-                    borderWidth: 1
+                    backgroundColor: [
+                        'rgba(79, 172, 254, 0.8)',
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(139, 92, 246, 0.8)'
+                    ],
+                    borderColor: [
+                        '#4facfe',
+                        '#10b981',
+                        '#f59e0b',
+                        '#ef4444',
+                        '#8b5cf6'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                    shadowOffsetX: 0,
+                    shadowOffsetY: 4,
+                    shadowBlur: 8,
+                    shadowColor: 'rgba(0, 0, 0, 0.1)'
                 }]
             },
             options: {
@@ -294,12 +616,51 @@ class ChartService {
                 indexAxis: 'y',
                 scales: {
                     x: {
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                        ticks: { color: '#94a3b8' }
+                        grid: { 
+                            color: 'rgba(255, 255, 255, 0.1)',
+                            drawBorder: false,
+                            drawTicks: false
+                        },
+                        ticks: { 
+                            color: '#94a3b8',
+                            font: {
+                                family: 'Inter, sans-serif',
+                                size: 11,
+                                weight: '500'
+                            },
+                            padding: 10
+                        },
+                        border: {
+                            display: false
+                        }
                     },
                     y: {
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                        ticks: { color: '#94a3b8' }
+                        grid: { 
+                            color: 'rgba(255, 255, 255, 0.1)',
+                            drawBorder: false,
+                            drawTicks: false
+                        },
+                        ticks: { 
+                            color: '#94a3b8',
+                            font: {
+                                family: 'Inter, sans-serif',
+                                size: 11,
+                                weight: '500'
+                            },
+                            padding: 10
+                        },
+                        border: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    ...this.chartConfigs.plugins,
+                    legend: {
+                        ...this.chartConfigs.plugins.legend,
+                        display: true,
+                        position: 'top',
+                        align: 'start'
                     }
                 }
             }
@@ -389,13 +750,121 @@ class ChartService {
     }
 
     /**
+     * Add chart animation on load
+     * @param {Chart} chart - Chart instance
+     */
+    addLoadAnimation(chart) {
+        const canvas = chart.canvas;
+        canvas.style.opacity = '0';
+        canvas.style.transform = 'scale(0.9)';
+        
+        setTimeout(() => {
+            canvas.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+            canvas.style.opacity = '1';
+            canvas.style.transform = 'scale(1)';
+        }, 100);
+    }
+
+    /**
+     * Add hover effects to chart
+     * @param {Chart} chart - Chart instance
+     */
+    addHoverEffects(chart) {
+        const canvas = chart.canvas;
+        
+        canvas.addEventListener('mouseenter', () => {
+            canvas.style.transition = 'transform 0.3s ease';
+            canvas.style.transform = 'scale(1.02)';
+        });
+        
+        canvas.addEventListener('mouseleave', () => {
+            canvas.style.transform = 'scale(1)';
+        });
+    }
+
+    /**
+     * Add click effects to chart
+     * @param {Chart} chart - Chart instance
+     */
+    addClickEffects(chart) {
+        const canvas = chart.canvas;
+        
+        canvas.addEventListener('click', (event) => {
+            canvas.style.transition = 'transform 0.1s ease';
+            canvas.style.transform = 'scale(0.98)';
+            
+            setTimeout(() => {
+                canvas.style.transform = 'scale(1.02)';
+                setTimeout(() => {
+                    canvas.style.transform = 'scale(1)';
+                }, 100);
+            }, 100);
+        });
+    }
+
+    /**
+     * Create animated counter for chart values
+     * @param {HTMLElement} element - Element to animate
+     * @param {number} target - Target value
+     * @param {number} duration - Animation duration in ms
+     */
+    animateCounter(element, target, duration = 2000) {
+        let start = 0;
+        const increment = target / (duration / 16);
+        
+        const timer = setInterval(() => {
+            start += increment;
+            if (start >= target) {
+                element.textContent = target;
+                clearInterval(timer);
+            } else {
+                element.textContent = Math.floor(start);
+            }
+        }, 16);
+    }
+
+    /**
+     * Add chart loading state
+     * @param {string} chartId - Chart ID
+     */
+    showChartLoading(chartId) {
+        const canvas = document.getElementById(chartId);
+        if (canvas) {
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.className = 'chart-loading-overlay';
+            loadingOverlay.innerHTML = `
+                <div class="chart-loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading chart...</p>
+                </div>
+            `;
+            canvas.parentNode.appendChild(loadingOverlay);
+        }
+    }
+
+    /**
+     * Hide chart loading state
+     * @param {string} chartId - Chart ID
+     */
+    hideChartLoading(chartId) {
+        const canvas = document.getElementById(chartId);
+        if (canvas) {
+            const loadingOverlay = canvas.parentNode.querySelector('.chart-loading-overlay');
+            if (loadingOverlay) {
+                loadingOverlay.remove();
+            }
+        }
+    }
+
+    /**
      * Get chart statistics
      * @returns {Object} Chart statistics
      */
     getStats() {
         return {
             totalCharts: this.charts.size,
-            chartTypes: Array.from(this.charts.keys())
+            chartTypes: Array.from(this.charts.keys()),
+            activeCharts: Array.from(this.charts.values()).filter(chart => chart && !chart.destroyed).length
         };
     }
 }

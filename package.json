@@ -1,7 +1,7 @@
 {
-  "name": "sky-sports-dashboard-demo",
+  "name": "lumara-sports-dashboard",
   "version": "1.0.0",
-  "description": "A comprehensive sports news dashboard built to demonstrate modern web development skills for the Sky News/Sky Sports Software Engineer position",
+  "description": "A comprehensive sports news dashboard built to demonstrate modern web development skills and real-time data visualization",
   "main": "index.html",
   "scripts": {
     "start": "http-server -p 8000 -o",
@@ -16,7 +16,7 @@
     "responsive",
     "performance",
     "analytics",
-    "sky-sports",
+    "lumara-sports",
     "demo",
     "portfolio"
   ],

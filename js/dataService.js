@@ -10,7 +10,7 @@
 
 class DataService {
     constructor() {
-        this.baseUrl = 'https://api.skysports.com/v1'; // Mock API endpoint
+        this.baseUrl = 'https://api.lumarasports.com/v1'; // Mock API endpoint
         this.cache = new Map();
         this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
     }

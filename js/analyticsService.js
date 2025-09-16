@@ -43,10 +43,10 @@ class AnalyticsService {
      * @returns {string} User ID
      */
     getUserId() {
-        let userId = localStorage.getItem('sky_sports_user_id');
+        let userId = localStorage.getItem('lumara_sports_user_id');
         if (!userId) {
             userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('sky_sports_user_id', userId);
+            localStorage.setItem('lumara_sports_user_id', userId);
         }
         return userId;
     }
