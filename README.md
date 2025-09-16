@@ -206,6 +206,6 @@ This project is created for demonstration purposes for the Sky News/Sky Sports S
 
 ---
 
-**Built with ❤️ for the Sky News/Sky Sports Software Engineer position**
+**Built with ❤️ *
 
 *Demonstrating: Real-time data visualization, Mobile-responsive design, Performance monitoring, Clean documented code, Unit testing*
