@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sky Sports Dashboard - Real-time Sports News & Analytics</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-tv"></i>
+                <h1>Sky Sports Dashboard</h1>
+            </div>
+            <div class="header-controls">
+                <div class="live-indicator">
+                    <span class="live-dot"></span>
+                    <span>LIVE</span>
+                </div>
+                <div class="last-updated">
+                    Last updated: <span id="lastUpdated">--:--</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav-tabs">
+        <div class="nav-container">
+            <button class="nav-tab active" data-tab="overview">Overview</button>
+            <button class="nav-tab" data-tab="football">Football</button>
+            <button class="nav-tab" data-tab="cricket">Cricket</button>
+            <button class="nav-tab" data-tab="tennis">Tennis</button>
+            <button class="nav-tab" data-tab="analytics">Analytics</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Overview Tab -->
+        <div class="tab-content active" id="overview">
+            <div class="dashboard-grid">
+                <!-- Live Scores Widget -->
+                <div class="widget live-scores">
+                    <div class="widget-header">
+                        <h3><i class="fas fa-futbol"></i> Live Scores</h3>
+                        <button class="refresh-btn" id="refreshScores">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div class="scores-container" id="liveScores">
+                        <!-- Live scores will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Breaking News Widget -->
+                <div class="widget breaking-news">
+                    <div class="widget-header">
+                        <h3><i class="fas fa-bolt"></i> Breaking News</h3>
+                        <span class="news-count" id="newsCount">0</span>
+                    </div>
+                    <div class="news-container" id="breakingNews">
+                        <!-- Breaking news will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Performance Metrics Widget -->
+                <div class="widget performance-metrics">
+                    <div class="widget-header">
+                        <h3><i class="fas fa-chart-line"></i> Performance Metrics</h3>
+                    </div>
+                    <div class="metrics-grid">
+                        <div class="metric">
+                            <div class="metric-value" id="pageLoadTime">--</div>
+                            <div class="metric-label">Page Load (ms)</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value" id="apiResponseTime">--</div>
+                            <div class="metric-label">API Response (ms)</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value" id="activeUsers">--</div>
+                            <div class="metric-label">Active Users</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value" id="errorRate">--</div>
+                            <div class="metric-label">Error Rate (%)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Real-time Chart Widget -->
+                <div class="widget chart-widget">
+                    <div class="widget-header">
+                        <h3><i class="fas fa-chart-area"></i> Real-time Analytics</h3>
+                        <div class="chart-controls">
+                            <select id="chartType">
+                                <option value="line">Line Chart</option>
+                                <option value="bar">Bar Chart</option>
+                                <option value="doughnut">Doughnut Chart</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="realTimeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Football Tab -->
+        <div class="tab-content" id="football">
+            <div class="sport-dashboard">
+                <div class="sport-header">
+                    <h2><i class="fas fa-futbol"></i> Football</h2>
+                    <div class="league-selector">
+                        <select id="footballLeague">
+                            <option value="premier-league">Premier League</option>
+                            <option value="champions-league">Champions League</option>
+                            <option value="europa-league">Europa League</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="football-content">
+                    <div class="fixtures-widget">
+                        <h3>Today's Fixtures</h3>
+                        <div class="fixtures-list" id="footballFixtures">
+                            <!-- Fixtures will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    <div class="standings-widget">
+                        <h3>League Table</h3>
+                        <div class="standings-table" id="footballStandings">
+                            <!-- Standings will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cricket Tab -->
+        <div class="tab-content" id="cricket">
+            <div class="sport-dashboard">
+                <div class="sport-header">
+                    <h2><i class="fas fa-baseball"></i> Cricket</h2>
+                    <div class="series-selector">
+                        <select id="cricketSeries">
+                            <option value="ashes">The Ashes</option>
+                            <option value="world-cup">World Cup</option>
+                            <option value="ipl">IPL</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="cricket-content">
+                    <div class="live-match-widget">
+                        <h3>Live Match</h3>
+                        <div class="match-scorecard" id="cricketScorecard">
+                            <!-- Scorecard will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    <div class="stats-widget">
+                        <h3>Player Statistics</h3>
+                        <div class="player-stats" id="cricketStats">
+                            <!-- Stats will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tennis Tab -->
+        <div class="tab-content" id="tennis">
+            <div class="sport-dashboard">
+                <div class="sport-header">
+                    <h2><i class="fas fa-table-tennis"></i> Tennis</h2>
+                    <div class="tournament-selector">
+                        <select id="tennisTournament">
+                            <option value="wimbledon">Wimbledon</option>
+                            <option value="us-open">US Open</option>
+                            <option value="french-open">French Open</option>
+                            <option value="australian-open">Australian Open</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="tennis-content">
+                    <div class="current-matches">
+                        <h3>Current Matches</h3>
+                        <div class="matches-list" id="tennisMatches">
+                            <!-- Matches will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    <div class="rankings-widget">
+                        <h3>World Rankings</h3>
+                        <div class="rankings-table" id="tennisRankings">
+                            <!-- Rankings will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Tab -->
+        <div class="tab-content" id="analytics">
+            <div class="analytics-dashboard">
+                <div class="analytics-header">
+                    <h2><i class="fas fa-chart-pie"></i> Analytics Dashboard</h2>
+                    <div class="date-range">
+                        <input type="date" id="startDate">
+                        <span>to</span>
+                        <input type="date" id="endDate">
+                        <button id="updateAnalytics">Update</button>
+                    </div>
+                </div>
+                <div class="analytics-grid">
+                    <div class="analytics-widget">
+                        <h3>User Engagement</h3>
+                        <canvas id="engagementChart"></canvas>
+                    </div>
+                    <div class="analytics-widget">
+                        <h3>Content Performance</h3>
+                        <canvas id="contentChart"></canvas>
+                    </div>
+                    <div class="analytics-widget">
+                        <h3>Device Breakdown</h3>
+                        <canvas id="deviceChart"></canvas>
+                    </div>
+                    <div class="analytics-widget">
+                        <h3>Geographic Distribution</h3>
+                        <canvas id="geoChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                <p>&copy; 2024 Sky Sports Dashboard Demo - Built for Sky News/Sky Sports Application</p>
+                <p>Demonstrating: Real-time data visualization, Mobile-responsive design, Performance monitoring, Clean documented code, Unit testing</p>
+            </div>
+            <div class="footer-links">
+                <a href="https://github.com/ashaz3256/lumara-website" target="_blank">
+                    <i class="fab fa-github"></i> Source Code
+                </a>
+                <a href="https://tradingjournalpro.co.uk" target="_blank">
+                    <i class="fas fa-external-link-alt"></i> TradingJournalPro
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading data...</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/dataService.js"></script>
+    <script src="js/chartService.js"></script>
+    <script src="js/performanceMonitor.js"></script>
+    <script src="js/analyticsService.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/tests.js"></script>
+</body>
+</html>
