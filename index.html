@@ -25,6 +25,13 @@
             }
             originalError.apply(console, args);
         };
+
+        // Debug: Check if files are loading
+        window.addEventListener('load', function() {
+            console.log('✅ Page loaded successfully');
+            console.log('✅ CSS loaded:', document.querySelector('link[href="styles.css"]') ? 'Yes' : 'No');
+            console.log('✅ Scripts loaded:', document.querySelectorAll('script[src^="js/"]').length, 'out of 8');
+        });
     </script>
     <style>
         /* Fallback styles to ensure basic styling works */
