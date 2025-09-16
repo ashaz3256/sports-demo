@@ -41,6 +41,13 @@
 }
 
 /* Light Mode Specific Styles */
+[data-theme="light"] body {
+    background: #f8fafc; /* Fallback light background */
+    background: var(--dark-gradient);
+    color: #1e293b; /* Fallback light text color */
+    color: var(--text-primary);
+}
+
 [data-theme="light"] body::before {
     background: 
         radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
@@ -98,8 +105,10 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0f172a; /* Fallback dark background */
     background: var(--dark-gradient);
     background-attachment: fixed;
+    color: #f8fafc; /* Fallback text color */
     color: var(--text-primary);
     min-height: 100vh;
     overflow-x: hidden;
