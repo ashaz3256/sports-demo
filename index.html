@@ -9,6 +9,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Filter out extension-related console errors
+        const originalError = console.error;
+        console.error = function(...args) {
+            const message = args.join(' ');
+            if (message.includes('background.js') || 
+                message.includes('serviceWorker.js') || 
+                message.includes('content.js') ||
+                message.includes('checkoutUrls') ||
+                message.includes('Frame with ID') ||
+                message.includes('No frame with id') ||
+                message.includes('No tab with id')) {
+                return; // Don't log extension errors
+            }
+            originalError.apply(console, args);
+        };
+    </script>
     <style>
         /* Fallback styles to ensure basic styling works */
         body {
