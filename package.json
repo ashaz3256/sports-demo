@@ -6,9 +6,7 @@
   "scripts": {
     "start": "http-server -p 8000 -o",
     "dev": "http-server -p 8000 -o -c-1",
-    "test": "echo 'Tests run automatically in the browser. Open index.html in a web browser to run tests.'",
-    "build": "echo 'No build process required - static files only'",
-    "deploy": "echo 'Deploy to your preferred static hosting service'"
+    "test": "echo 'Tests run automatically in the browser. Open index.html in a web browser to run tests.'"
   },
   "keywords": [
     "sports",
