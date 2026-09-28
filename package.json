@@ -1,7 +1,7 @@
 {
-  "name": "lumara-sports-dashboard",
+  "name": "sports-dashboard",
   "version": "1.0.0",
-  "description": "A comprehensive sports news dashboard built to demonstrate modern web development skills and real-time data visualization",
+  "description": "A responsive sports news and analytics dashboard built with vanilla JavaScript and Chart.js",
   "main": "index.html",
   "scripts": {
     "start": "http-server -p 8000 -o",
@@ -20,13 +20,13 @@
     "demo",
     "portfolio"
   ],
-  "author": "Lumara Team",
+  "author": "ashaz3256",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ashaz3256/lumara-website.git"
+    "url": "https://github.com/ashaz3256/sports-demo.git"
   },
-  "homepage": "https://github.com/ashaz3256/lumara-website#readme",
+  "homepage": "https://github.com/ashaz3256/sports-demo#readme",
   "devDependencies": {
     "http-server": "^14.1.1"
   },
